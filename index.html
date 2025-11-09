@@ -519,6 +519,11 @@
 
   /* Mobile-specific adjustments */
   @media (max-width: 768px) {
+    body {
+      overflow-y: auto;
+      overflow-x: hidden;
+    }
+    
     .main-box {
       margin: 10px;
     }
@@ -526,6 +531,7 @@
     .popup {
       margin: 10px;
       width: calc(100% - 20px);
+      max-width: calc(100% - 20px);
     }
     
     .popup-content img {
@@ -550,6 +556,21 @@
     .icons {
       margin-top: 30px;
       gap: 30px;
+    }
+    
+    .work-gallery {
+      height: 200px;
+    }
+    
+    .carousel-nav {
+      bottom: -50px;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .popup-header {
+      cursor: default;
+      touch-action: auto;
     }
   }
 </style>
@@ -714,10 +735,17 @@
   function openPopup(id) {
     const popup = document.getElementById(id);
     popup.classList.add('active');
-    // Center the popup
-    popup.style.top = '50%';
-    popup.style.left = '50%';
-    popup.style.transform = 'translate(-50%, -50%)';
+    
+    // On mobile, make it fullscreen. On desktop, center it.
+    if (window.innerWidth <= 768) {
+      popup.style.top = '0';
+      popup.style.left = '0';
+      popup.style.transform = 'none';
+    } else {
+      popup.style.top = '50%';
+      popup.style.left = '50%';
+      popup.style.transform = 'translate(-50%, -50%)';
+    }
   }
 
   function closePopup(id) {
@@ -730,11 +758,12 @@
   const DRAG_THRESHOLD = 5;
 
   function startDrag(e, popup) {
-    // Prevent dragging on touch devices with small screens
-    if (e.type === 'touchstart' && window.innerWidth < 768) {
+    // Allow dragging on all devices except very small screens
+    if (window.innerWidth < 480) {
       return;
     }
     
+    e.preventDefault();
     currentPopup = popup;
     
     // Handle both mouse and touch events
@@ -770,7 +799,7 @@
 
   // Handle touch movement
   document.addEventListener('touchmove', (e) => {
-    if (!currentPopup || window.innerWidth < 768) return;
+    if (!currentPopup) return;
     
     const touch = e.touches[0];
     
