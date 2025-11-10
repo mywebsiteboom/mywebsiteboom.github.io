@@ -18,6 +18,82 @@
     position: relative;
   }
 
+  /* 📱 Mobile-Only Notification Banner */
+  .mobile-notice {
+    display: none;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    background: rgba(15, 40, 80, 0.95);
+    padding: 20px;
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.4);
+    z-index: 9999;
+    animation: slideUp 0.5s ease forwards;
+    backdrop-filter: blur(10px);
+    border-top: 2px solid rgba(94, 163, 208, 0.5);
+  }
+  
+  @keyframes slideUp {
+    from { 
+      opacity: 0;
+      transform: translateY(100%);
+    }
+    to { 
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  .mobile-notice-content {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+  
+  .mobile-notice h3 {
+    color: #5ea3d0;
+    font-size: 18px;
+    font-weight: 600;
+    margin: 0;
+  }
+  
+  .mobile-notice p {
+    color: #b8d4e8;
+    font-size: 14px;
+    line-height: 1.6;
+    margin: 0;
+  }
+  
+  .mobile-notice-btn {
+    background: #5ea3d0;
+    color: #001a3d;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 15px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    align-self: flex-end;
+    box-shadow: 0 4px 10px rgba(94, 163, 208, 0.3);
+  }
+  
+  .mobile-notice-btn:hover {
+    background: #87ceeb;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(94, 163, 208, 0.5);
+  }
+  
+  @media (max-width: 768px) {
+    .mobile-notice {
+      display: block;
+    }
+  }
+
   /* 🌊 Wave background (bottom of page) */
   .wave-container {
     position: fixed;
@@ -524,38 +600,73 @@
       overflow-x: hidden;
     }
     
+    /* 📱 Make main box smaller and more compact */
     .main-box {
-      margin: 10px;
+      width: 85%;
+      max-width: 400px;
+      min-height: 350px;
+      padding-bottom: 15px;
     }
     
+    h1 {
+      margin-top: 25px;
+      font-size: clamp(35px, 9vw, 50px);
+    }
+    
+    .icons {
+      margin-top: 25px;
+      gap: 25px;
+    }
+    
+    /* 📱 Make popups centered with margin from top */
     .popup {
-      margin: 10px;
-      width: calc(100% - 20px);
-      max-width: calc(100% - 20px);
+      width: 90%;
+      max-width: 90%;
+      max-height: 80vh;
+      top: 50% !important;
+      left: 50% !important;
+      transform: translate(-50%, -50%) !important;
     }
     
+    .popup-content {
+      padding: 20px;
+      max-height: calc(80vh - 45px);
+    }
+    
+    /* 📱 Center profile image and text in About popup */
     .popup-content img {
       float: none;
       display: block;
       margin: 0 auto 15px;
     }
     
+    .popup-content h2,
+    .popup-content .subtitle {
+      text-align: center;
+    }
+    
+    /* 📱 Make social links horizontal and compact in Contact popup */
+    .social-links-grid {
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-bottom: 25px;
+    }
+    
+    .social-link {
+      padding: 20px 10px;
+    }
+    
+    .social-link i {
+      font-size: clamp(30px, 6vw, 40px);
+      margin-bottom: 8px;
+    }
+    
+    .social-link p {
+      font-size: clamp(12px, 2.5vw, 14px);
+    }
+    
     .intro-text, .section-box {
       padding: 12px;
-    }
-    
-    .social-links-grid {
-      grid-template-columns: 1fr;
-      gap: 15px;
-    }
-    
-    h1 {
-      margin-top: 30px;
-    }
-    
-    .icons {
-      margin-top: 30px;
-      gap: 30px;
     }
     
     .work-gallery {
@@ -572,10 +683,25 @@
       cursor: default;
       touch-action: auto;
     }
+    
+    /* 📱 Even smaller main box for very small phones */
+    .main-box {
+      width: 90%;
+      max-width: 350px;
+    }
   }
 </style>
 </head>
 <body>
+
+<!-- 📱 Mobile-Only Notice Banner -->
+<div class="mobile-notice" id="mobileNotice">
+  <div class="mobile-notice-content">
+    <h3>hey there!</h3>
+    <p>just letting you know that this site is best experienced on desktop, some features might be wonky on different devices.</p>
+    <button class="mobile-notice-btn" onclick="closeMobileNotice()">okay</button>
+  </div>
+</div>
 
 <!-- 🌟 Shooting Stars -->
 <div class="shooting_star"></div>
@@ -732,15 +858,40 @@
 </div>
 
 <script>
+  // Close mobile notice banner
+  function closeMobileNotice() {
+    const notice = document.getElementById('mobileNotice');
+    notice.style.animation = 'slideDown 0.3s ease forwards';
+    setTimeout(() => {
+      notice.style.display = 'none';
+    }, 300);
+  }
+  
+  // Add slide down animation
+  const style = document.createElement('style');
+  style.textContent = `
+    @keyframes slideDown {
+      from { 
+        opacity: 1;
+        transform: translateY(0);
+      }
+      to { 
+        opacity: 0;
+        transform: translateY(100%);
+      }
+    }
+  `;
+  document.head.appendChild(style);
+
   function openPopup(id) {
     const popup = document.getElementById(id);
     popup.classList.add('active');
     
-    // On mobile, make it fullscreen. On desktop, center it.
+    // On mobile, center it with !important to override drag positioning
     if (window.innerWidth <= 768) {
-      popup.style.top = '0';
-      popup.style.left = '0';
-      popup.style.transform = 'none';
+      popup.style.top = '50%';
+      popup.style.left = '50%';
+      popup.style.transform = 'translate(-50%, -50%)';
     } else {
       popup.style.top = '50%';
       popup.style.left = '50%';
